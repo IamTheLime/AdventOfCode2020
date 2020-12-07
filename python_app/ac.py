@@ -108,7 +108,7 @@ def passport_rules(passport, part):
         if re.match(r"(\d+)(in|cm)", passport['hgt']) is None:
             return False
         hgt = re.match(r"(?P<hgt>\d+)(?P<unit>(in|cm))", passport['hgt']).groupdict()
-        hcl = re.match(r"^#[a-z0-9]{6}$",passport['hcl'])
+        hcl = re.match(r"^#[a-f0-9]{6}$",passport['hcl'])
         pid = re.match(r"(^[0-9]{9}$)", passport['pid'])
         return all([
             int(passport['byr']) >= 1920 and int(passport['byr']) <= 2002,
@@ -134,3 +134,7 @@ print(
         transformer(passport+"\n") for passport in re.split( r"\n{2}", input_4) if passport_rules(transformer(passport+"\n"), 2)
     ])
 )
+
+# PROBLEM 3
+
+input_4 = eat_raw_input("4.txt")

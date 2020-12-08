@@ -189,6 +189,7 @@ print(
 # PROBLEM 7
 
 input_7 = eat_input("7.txt")
+
 transformer = lambda expr: {
     re.compile(
         r"(?P<container>[a-zA-zZ]+\s[a-zA-Z]+)\sbags\scontain\s.+"
@@ -223,8 +224,6 @@ print(
     )
 )
 
-print("7.2")
-
 def bag_calculator(bag_content):
     if len(bag_content) == 0:
         return 1
@@ -234,6 +233,58 @@ def bag_calculator(bag_content):
         0
     ) + 1
 
+print("7.2")
 print(
     bag_calculator(structured_input["shiny gold"]) - 1 #subracting one as bag calculator will include the holder bag
 )
+
+# PROBLEM 7
+
+input_8 = eat_input("8.txt")
+
+transformer = lambda expr: re.match(
+    r"(?P<op>(nop|acc|jmp))\s(?P<value>(-|\+)\d+)",
+    expr
+).groupdict()
+
+
+instructions = [transformer(instruction) for instruction in input_8]
+
+def executor(instructions):
+    index = 0
+    acc = 0
+    stack = []
+
+    while index not in stack and index < len(instructions):
+        instruction = instructions[index]
+        stack.append(index)
+        if instruction['op'] == 'jmp':
+            index += int(instruction['value'])
+        elif instruction['op'] == 'acc':
+            acc += int(instruction['value'])
+            index += 1
+        else:
+            index += 1
+
+    if index == len(instructions):
+        return ("OK", acc)
+    return ("ERROR", acc)
+
+print("8.1")
+print(executor(instructions))
+
+def generate_new_instruction_stack(instruction_stack, index):
+    import copy
+    new_stack = copy.deepcopy(instruction_stack)
+    new_stack[index]['op'] = 'nop' if new_stack[index]['op'] == 'jmp' else 'jmp'
+    return new_stack
+
+print("8.1")
+
+def solver(instructions):
+    for instruction_stack in [generate_new_instruction_stack(instructions, index) for index, operation in enumerate(instructions) if operation['op'] in ['jmp', 'nop']]:
+        if result := executor(instruction_stack):
+            if result[0] == "OK":
+                return result
+
+print(solver(instructions))

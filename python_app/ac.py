@@ -1,5 +1,5 @@
 import math
-from itertools import combinations
+from itertools import combinations, count
 import re
 import functools
 
@@ -172,14 +172,68 @@ answer_list = [
 
 print("6.1")
 print(
-    sum([ len(set([answer for person in group for answer in person])) for group in answer_list])
+    sum([len(set([answer for person in group for answer in person])) for group in answer_list])
 )
 
 print("6.2")
 print(
-    sum([ functools.reduce(
-        lambda acc, answer: acc + 1 if all([answer in person for person in group]) else acc,
-        group[0],
+    sum([
+        functools.reduce(
+            lambda acc, answer: acc + 1 if all([answer in person for person in group]) else acc,
+            group[0],
+            0
+        ) for group in answer_list
+    ])
+)
+
+# PROBLEM 7
+
+input_7 = eat_input("7.txt")
+transformer = lambda expr: {
+    re.compile(
+        r"(?P<container>[a-zA-zZ]+\s[a-zA-Z]+)\sbags\scontain\s.+"
+    ).findall(expr)[0]:
+    [
+        bag_description.groupdict() for bag_description in
+        re.compile(
+            r"((?P<num_bags>\d+)\s(?P<bag>[a-zA-zZ]+\s[a-zA-Z]+)\sbag(s?)(,|\.)\s?)"
+        ).finditer(expr)
+    ]
+}
+
+def shiny_gold_bag_exists(bag_content):
+    if len(bag_content) == 0:
+        return False
+    for sub_bag in bag_content:
+        if sub_bag['bag'] == "shiny gold" and int(sub_bag['num_bags']) > 0:
+            return True
+    for sub_bag in bag_content:
+        if shiny_gold_bag_exists(structured_input[sub_bag['bag']]):
+            return True
+    return False
+
+structured_input = functools.reduce( lambda acc, bag: {**acc, **bag}, [transformer(result) for result in input_7], {})
+
+print("7.1")
+print(
+    functools.reduce(
+        lambda acc, bag: acc + 1 if shiny_gold_bag_exists(bag[1]) else acc,
+        structured_input.items(),
         0
-    ) for group in answer_list])
+    )
+)
+
+print("7.2")
+
+def bag_calculator(bag_content):
+    if len(bag_content) == 0:
+        return 1
+    return functools.reduce(
+        lambda acc, sub_bag: acc + int(sub_bag['num_bags']) * bag_calculator(structured_input[sub_bag['bag']]),
+        bag_content,
+        0
+    ) + 1
+
+print(
+    bag_calculator(structured_input["shiny gold"]) - 1 #subracting one as bag calculator will include the holder bag
 )

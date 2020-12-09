@@ -238,7 +238,7 @@ print(
     bag_calculator(structured_input["shiny gold"]) - 1 #subracting one as bag calculator will include the holder bag
 )
 
-# PROBLEM 7
+# PROBLEM 8
 
 input_8 = eat_input("8.txt")
 
@@ -288,3 +288,37 @@ def solver(instructions):
                 return result
 
 print(solver(instructions))
+
+# PROBLEM 9
+
+input_9 = [ int(number) for number in eat_input("9.txt")]
+
+def no_preamble_matches(start, stop, number, inpt):
+    return all([ False if number-preamble_number in inpt[start:stop] else True for preamble_number in inpt[start:stop]])
+
+def sum_finder(inpt, preamble):
+    return [number for index, number in enumerate(inpt[preamble:]) if no_preamble_matches(index, index+preamble, number, inpt)]
+
+print("9.1")
+print(
+    sum_finder(input_9, 25)[0]
+)
+
+def search_matches(input_9, start_index, inv_number):
+    for stop_index in range(start_index,len(input_9)):
+        if (result := sum(input_9[start_index:stop_index])) > inv_number:
+            return
+        elif result == inv_number:
+            return input_9[start_index:stop_index]
+
+
+def contiguous_search(input_9, inv_number):
+    for index, pivot in enumerate(input_9):
+        if found_match := search_matches(input_9, index, inv_number):
+            return found_match
+
+print("9.2")
+print(
+    contiguous_interval := contiguous_search(input_9, sum_finder(input_9, 25)[0]),
+    max(contiguous_interval) + min(contiguous_interval)
+)

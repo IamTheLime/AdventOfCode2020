@@ -1,7 +1,8 @@
 import math
-from itertools import combinations, count
+from itertools import combinations
 import re
 import functools
+from pprint import pp
 
 def eat_input(input_file):
     with open('../inputs/' + input_file) as f:
@@ -321,4 +322,40 @@ print("9.2")
 print(
     contiguous_interval := contiguous_search(input_9, sum_finder(input_9, 25)[0]),
     max(contiguous_interval) + min(contiguous_interval)
+)
+
+# PROBLEM 9
+
+input_10 = [0] + ( tmp_inpt := sorted([int(charger) for charger in eat_input("10.txt")])) + [tmp_inpt[-1] + 3]
+
+print("10.1")
+print(
+    [ input_10[index+1] - input_10[index] for index, charger in enumerate(input_10[:-1])].count(1) *
+    [ input_10[index+1] - input_10[index] for index, charger in enumerate(input_10[:-1])].count(3)
+)
+
+print("10.2")
+# This will take infinite time to run in the final example
+def count_combinations(jmp_idx_map, vertice):
+    if vertice == list(jmp_idx_map.keys())[-1]:
+        return 1
+
+    return functools.reduce(
+        lambda acc, idx: acc + count_combinations(jmp_idx_map, idx),
+        jmp_idx_map[vertice],
+        0
+    )
+
+def get_jump_list(input_10):
+    jmp_idx_map = {}
+    for index, value in enumerate(input_10):
+        jumping_idxs = [sub_idx for sub_idx, sub_value in enumerate(input_10[index+1:], start=index + 1) if sub_value <= value + 3]
+        jmp_idx_map[index] = jumping_idxs
+
+    jolt_combinations = count_combinations(jmp_idx_map, list(jmp_idx_map.keys())[0])
+    return jolt_combinations
+
+
+pp(
+    get_jump_list(input_10)
 )

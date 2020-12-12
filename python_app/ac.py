@@ -335,9 +335,8 @@ print(
 )
 
 print("10.2")
-memo_cache = {}
 # This will take infinite time to run in the final example
-def count_combinations(jmp_idx_map, vertice):
+def count_combinations(jmp_idx_map, vertice, memo_cache = {}):
     if vertice in memo_cache.keys():
         return memo_cache[vertice]
 
@@ -345,7 +344,7 @@ def count_combinations(jmp_idx_map, vertice):
         count = 1
     else:
         count = functools.reduce(
-            lambda acc, idx: acc + count_combinations(jmp_idx_map, idx),
+            lambda acc, idx: acc + count_combinations(jmp_idx_map, idx, memo_cache),
             jmp_idx_map[vertice],
             0
         )
